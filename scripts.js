@@ -1,13 +1,15 @@
 $(document).ready(function(){
 
+    $('#search').focus();
 
     $('#search').on('click', function(){
         $('#search').val('')
     });
 
     // Searching
-    $('#search').keypress(function(){
+    $('#search').keypress(delay(function(){
         $('.results').html('');
+        $('.single-result').html('');
         var search = $(this).val().toLowerCase();
         // Search through json
         $.getJSON('https://pokeapi.co/api/v2/pokemon?limit=1000').done(function(data){
@@ -25,7 +27,7 @@ $(document).ready(function(){
                 $('.results').append("<div id='result' data-id='"+ value.id +"'>"+ value.name +"</div>");
             });
         });
-    });
+    }, 1000));
 
     // Selection
     $('.results').on('click', $('#result'), function(event){
@@ -38,7 +40,7 @@ $(document).ready(function(){
                 'types': data.types
             };
 
-            $('.results').append("<div id='pokemon-result' data-id='"+ pokemon.id +"'><img class='pokemon-sprite' src='"+ pokemon.sprite +"'/><h1>"+ pokemon.name +"</h1></div><div class='pokemon-types'></div><div class='pokemon-type-info flex'></div>");
+            $('.single-result').append("<div id='pokemon-result' data-id='"+ pokemon.id +"'><img class='pokemon-sprite' src='"+ pokemon.sprite +"'/><h1>"+ pokemon.name +"</h1></div><div class='pokemon-types'></div><div class='pokemon-type-info flex'></div>");
 
             $.each(pokemon.types, function(index, value){
                 $('.pokemon-types').append('<div class="type '+ value.type.name.toLowerCase() +'">'+ value.type.name +'</div>');
@@ -66,4 +68,12 @@ $(document).ready(function(){
             });
         });
     });
+
+    function delay(fn, ms) {
+        let timer = 0
+        return function(...args) {
+            clearTimeout(timer)
+            timer = setTimeout(fn.bind(this, ...args), ms || 0)
+        }
+    }
 });
